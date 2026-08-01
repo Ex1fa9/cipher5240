@@ -1,57 +1,111 @@
 import random
+import os
+
+# pip install colorama
+from colorama import init, Fore
+init()
+
+# pip install pyperclip
+import pyperclip
 
 alphabet = {
-    "а": "8",
-    "б": "ъ",
-    "в": "b",
-    "г": "7",
-    "д": "d",
-    "е": "ー",
-    "ё": "ー",
-    "ж": "w",
-    "з": "5",
-    "и": "N",
-    "й": "Ň",
-    "к": "4",
-    "л": "v",
-    "м": "m",
-    "н": "h",
-    "о": "ⵠ",
-    "п": "π",
-    "р": "q",
-    "с": "§",
-    "т": "9",
-    "у": "2",
-    "ф": "÷",
-    "х": "×",
-    "ц": "с",
-    "ч": "u",
-    "ш": "=",
-    "щ": "=",
-    "ъ": "3",
-    "ы": "6",
-    "ь": "3",
-    "э": "є",
-    "ю": "1",
-    "я": "0"
-    }
+    "А": "8", "Б": "ъ", "В": "b", "Г": "7", "Д": "d", "Е": "—", "Ё": "~",
+    "Ж": "w", "З": "5", "И": "p", "Й": "ï", "К": "4", "Л": "v", "М": "m",
+    "Н": "h", "О": "∆", "П": "π", "Р": "q", "С": "§", "Т": "9", "У": "2",
+    "Ф": "ß", "Х": "x", "Ц": "c", "Ч": "u", "Ш": "≋", "Щ": "þ", "Ъ": "æ",
+    "Ы": "6", "Ь": "3", "Э": "є", "Ю": "1", "Я": "0",
 
-sym = ["@", "#", "$", "€", "¢", "£", "¥", "&"]
+    "?": "$", "!": "€", ",": "¢", ".": "@", '"': "£", "'": "`",
 
-def zxc(text):
-    results = ""
-    probel = 0
-    
-    for ch in text:
-        results += alphabet.get(ch, ch)
-        
-        if ch != " ":
-            probel += 1
-        
-            if probel % 2 == 0:
-                results += random.choice(sym)
-            
-    return results  
-    
-word = input("Введите слово: ").lower()
-print("Шифр: ", zxc(word))
+    "0": "Ω", "1": "μ", "2": "t", "3": "∑", "4": "δ",
+    "5": "√", "6": "∝", "7": "∇", "8": "θ", "9": "λ"
+}
+
+sym = ["#", "&", "¤", "※", "₪", "₿", "◊", "★", "●"]
+
+reverse_alphabet = {v: k for k, v in alphabet.items()}
+
+def crypt(text):
+	result = []
+	schet = 0
+	
+	for char in text:
+		upper_char = char.upper()
+		if upper_char in alphabet:
+			enc = alphabet[upper_char]
+		else:
+			enc = char
+			
+		result.append(enc)
+		schet += 1
+		
+		if schet % 2 == 0:
+			result.append(random.choice(sym))
+			
+			
+	return "".join(result)
+
+def decrypt(text):
+    result = []
+    cleaned = ""
+
+    for char in text:
+        if char not in sym:
+            cleaned += char
+
+    for char in cleaned:
+        if char in reverse_alphabet:
+            result.append(reverse_alphabet[char])
+        else:
+            result.append(char)
+
+    return "".join(result)
+
+def fix_text(text):
+    sentences = [s.strip().capitalize() for s in text.split(".") if s.strip()]
+    return ". ".join(sentences) + ("." if text.endswith(".") else "")
+
+menu = Fore.GREEN + """[Главное Меню] """ + Fore.CYAN + """
+[1] Текст -> Шифр
+[2] Шифр -> Текст
+[0] Выход
+"""
+
+os.system("cls" if os.name == "nt" else "clear")
+while True:
+    print(menu)
+    z = input(Fore.GREEN + "Выбор: ")
+    os.system("cls" if os.name == "nt" else "clear")
+
+    if z == "0":
+        break
+
+    elif z == "1":
+        print(Fore.RED + "Для выхода -> 0")
+        while True:
+            x = input(Fore.GREEN + "Введите текст: ")
+            if x == "0":
+                os.system("cls" if os.name == "nt" else "clear")
+                break
+            else:
+                result = crypt(x)
+                print(result)
+                pyperclip.copy(result)
+                print(Fore.YELLOW + "(скопировано в буфер обмена)\n")
+
+    elif z == "2":
+        print(Fore.RED + "Для выхода -> 0")
+        while True:
+            x = input(Fore.GREEN + "Введите шифр: ")
+            if x == "0":
+                os.system("cls" if os.name == "nt" else "clear")
+                break
+            else:
+                result = fix_text(decrypt(x))
+                print(result)
+                pyperclip.copy(result)
+                print(Fore.YELLOW + "(скопировано в буфер обмена)\n")
+
+    else:
+        os.system("cls" if os.name == "nt" else "clear")
+        print(Fore.RED + "Введите цифру от 0 до 2!")
